@@ -1,4 +1,7 @@
+let pvData = pv;
 let htmlData = html;
+
+let epiData = epi;
 let ipsData = ips;
 
 let getSpecification = () => {
@@ -59,10 +62,11 @@ let enhance = async () => {
     if (!ipsData || !ipsData.entry || ipsData.entry.length === 0) {
         throw new Error("IPS is empty or invalid.");
     }
+    
     let enhanceTag = "highlight";
     let triggerHighlight = false;
 
-    // Define logic: if eGFR < 30 → highlight <renal dose adjustment>
+    // Define logic: if eGFR < 30 → highlight <renal dose adjustment> - should work for every drug, since they have the class
     const eGFRCodes = ["48643-1", "33914-3", "62238-1"]; // Common LOINC codes for eGFR - what to look in the IPS
 
     let listOfCategoriesToSearch = ["236423003", "709044004"]; //what to look in extension to find class
