@@ -69,7 +69,7 @@ let enhance = async () => {
     // Define logic: if eGFR < 30 → highlight <renal dose adjustment> - should work for every drug, since they have the class
     const eGFRCodes = ["48643-1", "33914-3", "62238-1"]; // Common LOINC codes for eGFR - what to look in the IPS
 
-    let listOfCategoriesToSearch = ["236423003", "709044004"]; //what to look in extension to find class
+    let listOfCategoriesToSearch = [{"code":"236423003","system":"http://snomed.info/sct"},{"code":"709044004","system":"http://snomed.info/sct"}]; //what to look in extensions -made up code because there is none
 
     ipsData.entry.forEach((entry) => {
         if (
@@ -117,7 +117,7 @@ let enhance = async () => {
                              (coding) => {
                                  console.log("Extension: " + element.extension[0].valueString + ":" + coding.code)
                                  // Check if the code is in the list of categories to search
-                                 if (listOfCategoriesToSearch.includes(coding.code)) {
+                                    if (listOfCategoriesToSearch.some(item => item.code === coding.code && item.system === coding.system)) {
                                      // Check if the category is already in the list of categories
                                      categories.push(element.extension[0].valueString);
                                  }
