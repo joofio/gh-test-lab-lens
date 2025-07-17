@@ -5,7 +5,7 @@ const { JSDOM } = require("jsdom");
 
 // Load your input data
 global.html = fs.readFileSync(path.join(__dirname, "../data/html.html"), "utf-8");
-global.epi = JSON.parse(fs.readFileSync(path.join(__dirname, "../data/epi.json")));
+global.epi = JSON.parse(fs.readFileSync(path.join(__dirname, "../data/epi2.json")));
 global.ips = JSON.parse(fs.readFileSync(path.join(__dirname, "../data/ips.json")));
 
 // Set up DOM globally so the script can use it
@@ -54,11 +54,11 @@ describe("Pregnancy Annotation Script (non-invasive)", () => {
     }
 
     // Save result to file
-    const outputPath = path.join(outputDir, "enhanced.html");
+    const outputPath = path.join(outputDir, "enhanced2.html");
     fs.writeFileSync(outputPath, result, "utf-8");
 
     console.log(`✅ Enhanced HTML saved to: ${outputPath}`);
 
-    expect(result).toContain("lab-lens");
+    expect(result).not.toContain("lab-lens");
   });
 });

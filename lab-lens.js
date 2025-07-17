@@ -14,7 +14,7 @@ let annotationProcess = (listOfCategories, enhanceTag, document, response) => {
             let elements = document.getElementsByClassName(check);
             for (let i = 0; i < elements.length; i++) {
                 elements[i].classList.add(enhanceTag);
-                elements[i].classList.add("renal-lens");
+                elements[i].classList.add("lab-lens");
             }
             if (document.getElementsByTagName("head").length > 0) {
                 document.getElementsByTagName("head")[0].remove();
@@ -62,14 +62,14 @@ let enhance = async () => {
     if (!ipsData || !ipsData.entry || ipsData.entry.length === 0) {
         throw new Error("IPS is empty or invalid.");
     }
-    
+
     let enhanceTag = "highlight";
     let triggerHighlight = false;
 
     // Define logic: if eGFR < 30 → highlight <renal dose adjustment> - should work for every drug, since they have the class
     const eGFRCodes = ["48643-1", "33914-3", "62238-1"]; // Common LOINC codes for eGFR - what to look in the IPS
 
-    let listOfCategoriesToSearch = [{"code":"236423003","system":"http://snomed.info/sct"},{"code":"709044004","system":"http://snomed.info/sct"}]; //what to look in extensions -made up code because there is none
+    let listOfCategoriesToSearch = [{ "code": "236423003", "system": "http://snomed.info/sct" }, { "code": "709044004", "system": "http://snomed.info/sct" }]; //what to look in extensions -made up code because there is none
 
     ipsData.entry.forEach((entry) => {
         if (
@@ -99,41 +99,42 @@ let enhance = async () => {
         return htmlData;
     }
     console.log("eGFR lab result < 30 found.");
-    
-     // ePI traslation from terminology codes to their human redable translations in the sections
-     let compositions = 0;
-     let categories = [];
-     epi.entry.forEach((entry) => {
-         if (entry.resource.resourceType == "Composition") {
-             compositions++;
-             //Iterated through the Condition element searching for conditions
-             entry.resource.extension.forEach((element) => {
-                 
-                 // Check if the position of the extension[1] is correct
-                 if (element.extension[1].url == "concept") {
-                     // Search through the different terminologies that may be avaible to check in the condition
-                     if (element.extension[1].valueCodeableReference.concept != undefined) {
-                         element.extension[1].valueCodeableReference.concept.coding.forEach(
-                             (coding) => {
-                                 console.log("Extension: " + element.extension[0].valueString + ":" + coding.code)
-                                 // Check if the code is in the list of categories to search
-                                    if (listOfCategoriesToSearch.some(item => item.code === coding.code && item.system === coding.system)) {
-                                     // Check if the category is already in the list of categories
-                                     categories.push(element.extension[0].valueString);
-                                 }
-                             }
-                         );
-                     }
-                 }
-             });
-         }
-     });
-     if (compositions == 0) {
+
+    // ePI traslation from terminology codes to their human redable translations in the sections
+    let compositions = 0;
+    let categories = [];
+    epi.entry.forEach((entry) => {
+        if (entry.resource.resourceType == "Composition") {
+            compositions++;
+            //Iterated through the Condition element searching for conditions
+            entry.resource.extension.forEach((element) => {
+
+                // Check if the position of the extension[1] is correct
+                if (element.extension[1].url == "concept") {
+                    // Search through the different terminologies that may be avaible to check in the condition
+                    if (element.extension[1].valueCodeableReference.concept != undefined) {
+                        element.extension[1].valueCodeableReference.concept.coding.forEach(
+                            (coding) => {
+                                console.log("Extension: " + element.extension[0].valueString + ":" + coding.code)
+                                // Check if the code is in the list of categories to search
+                                if (listOfCategoriesToSearch.some(item => item.code === coding.code && item.system === coding.system)) {
+                                    // Check if the category is already in the list of categories
+                                    categories.push(element.extension[0].valueString);
+                                }
+                            }
+                        );
+                    }
+                }
+            });
+        }
+    });
+    if (compositions == 0) {
         throw new Error('Bad ePI: no category "Composition" found');
     }
-
+    console.log(categories);
     if (categories.length == 0) {
         // throw new Error("No categories found", categories);
+        console.log("No category Found: returnin as is.")
         return htmlData;
     }
     return await annotateHTMLsection(categories, enhanceTag);
