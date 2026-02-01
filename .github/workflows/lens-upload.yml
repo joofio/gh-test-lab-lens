@@ -16,6 +16,7 @@ jobs:
   # 4. Upload to prod server only when a tag is pushed
   upload-lenses:
     uses: Gravitate-Health/reusable-workflows/.github/workflows/lenses-upload.yaml@main
+    secrets: inherit  # Pass secrets from calling workflow (required for FHIR_SERVER_URL_DEV/PROD)
     with:
       # Only pass tag when the trigger is actually a tag push
       tag: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
