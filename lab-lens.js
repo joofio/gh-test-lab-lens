@@ -3,9 +3,27 @@ let htmlData = html;
 
 let epiData = epi;
 let ipsData = ips;
+let lang = "";
 
 let getSpecification = () => {
     return "2.0.0-renal-adjustment";
+};
+
+const getExplanation = (lang = "en") => {
+    const explanations = {
+        en: "This lens highlights sections related to renal dose adjustment when eGFR is low.",
+        pt: "Esta lente destaca seções relacionadas ao ajuste da dose renal quando a eGFR está baixa.",
+        es: "Esta lente resalta las secciones relacionadas con el ajuste de la dosis renal cuando la eGFR es baja.",
+        da: "Denne linse fremhæver afsnit relateret til justering af renal dosis, når eGFR er lav.",
+    };
+    return explanations[lang] || explanations.en;
+};
+
+const getReport = (lang = "en") => {
+    return {
+        message: getExplanation(lang),
+        status: "success",
+    };
 };
 
 let annotationProcess = (listOfCategories, enhanceTag, document, response) => {
@@ -21,9 +39,7 @@ let annotationProcess = (listOfCategories, enhanceTag, document, response) => {
             }
             if (document.getElementsByTagName("body").length > 0) {
                 response = document.getElementsByTagName("body")[0].innerHTML;
-                console.log("Response: " + response);
             } else {
-                console.log("Response: " + document.documentElement.innerHTML);
                 response = document.documentElement.innerHTML;
             }
         }
@@ -33,9 +49,7 @@ let annotationProcess = (listOfCategories, enhanceTag, document, response) => {
         throw new Error(
             "Annotation proccess failed: Returned empty or null response"
         );
-        //return htmlData
     } else {
-        console.log("Response: " + response);
         return response;
     }
 }
@@ -88,17 +102,14 @@ let enhance = async () => {
             );
 
             if (isEGFR && value < 30) {
-                console.log("eGFR < 30 detected:", value);
                 triggerHighlight = true;
             }
         }
     });
 
     if (!triggerHighlight) {
-        console.warn("No matching eGFR lab result < 30 found.");
         return htmlData;
     }
-    console.log("eGFR lab result < 30 found.");
 
     // ePI traslation from terminology codes to their human redable translations in the sections
     let compositions = 0;
@@ -115,7 +126,6 @@ let enhance = async () => {
                     if (element.extension[1].valueCodeableReference.concept != undefined) {
                         element.extension[1].valueCodeableReference.concept.coding.forEach(
                             (coding) => {
-                                console.log("Extension: " + element.extension[0].valueString + ":" + coding.code)
                                 // Check if the code is in the list of categories to search
                                 if (listOfCategoriesToSearch.some(item => item.code === coding.code && item.system === coding.system)) {
                                     // Check if the category is already in the list of categories
@@ -131,10 +141,7 @@ let enhance = async () => {
     if (compositions == 0) {
         throw new Error('Bad ePI: no category "Composition" found');
     }
-    console.log(categories);
     if (categories.length == 0) {
-        // throw new Error("No categories found", categories);
-        console.log("No category Found: returnin as is.")
         return htmlData;
     }
     return await annotateHTMLsection(categories, enhanceTag);
@@ -143,4 +150,6 @@ let enhance = async () => {
 return {
     enhance: enhance,
     getSpecification: getSpecification,
+    explanation: (language) => getExplanation(language || lang || "en"),
+    report: (language) => getReport(language || lang || "en"),
 };
