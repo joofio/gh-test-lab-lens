@@ -151,6 +151,29 @@
                   }
                 }
               ]
+            },
+            {
+              "url": "http://hl7.eu/fhir/ig/gravitate-health/StructureDefinition/HtmlElementLink",
+              "extension": [
+                {
+                  "url": "elementClass",
+                  "valueString": "lab-alert-place"
+                },
+                {
+                  "url": "concept",
+                  "valueCodeableReference": {
+                    "concept": {
+                      "coding": [
+                        {
+                          "code": "grav-5",
+                          "system": "https://www.gravitatehealth.eu/sid/doc",
+                          "display": "Lab alert place"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
             }
           ],
           "section": [

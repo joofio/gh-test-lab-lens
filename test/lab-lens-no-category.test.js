@@ -41,7 +41,7 @@ beforeAll(() => {
 
 describe("Pregnancy Annotation Script (non-invasive)", () => {
   test("should return version string", () => {
-    expect(annotation.getSpecification()).toBe("2.0.0-renal-adjustment");
+    expect(annotation.getSpecification()).toBe("2.1.0-renal-adjustment-banner");
   });
 
   test("should return enhanced HTML containing highlight class", async () => {
